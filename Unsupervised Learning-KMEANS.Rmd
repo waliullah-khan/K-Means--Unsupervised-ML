@@ -1,0 +1,64 @@
+---
+title: "Unsupervised Learning"
+output: html_document
+---
+
+
+# Loading packages and data
+
+```{r}
+
+
+library(tidyverse)
+library(cluster)
+library(factoextra)
+
+health_insurance <- read_csv("health_insurance-2.csv")
+
+```
+
+#data + factors
+
+
+```{r}
+
+health_insurance %>%
+  ggplot(aes(x = Weight, y = Cholesterol)) +
+  geom_point() +
+  facet_wrap(~Sex)
+
+health_insurance %>%
+  mutate(Sex = ifelse(Sex == 0, "Female", "Male")) %>%
+  mutate(Sex = factor(Sex, levels = c("Female", "Male"))) %>%
+  ggplot(aes(x = Weight, y = Cholesterol)) +
+  geom_point() +
+  facet_wrap(~Sex)
+
+
+```
+##Cluster
+
+
+```{r}
+
+
+#health_insurance[,] #row, column
+
+
+set.seed(1)
+health_clusters <- kmeans(health_insurance[,2:3], centers = 5, nstart = 10)
+health_clusters
+
+health_insurance %>%
+  mutate(my_cluster = factor(health_clusters$cluster)) %>%
+  ggplot(aes(x = Weight, y = Cholesterol, color = my_cluster)) +
+  geom_point()
+
+health_clusters$cluster
+
+options(scipen = 999)
+fviz_nbclust(health_insurance[,2:3], kmeans, method = "wss")
+
+
+```
+
